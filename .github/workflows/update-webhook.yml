@@ -1,0 +1,25 @@
+name: Update JSON from webhook
+
+on:
+  repository_dispatch:
+    types: [webhook-data]
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Write webhook data to file
+        run: |
+          echo '${{ toJson(github.event.client_payload.data) }}' > data.json
+
+      - name: Commit & push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add data.json
+          git commit -m "Update data.json from webhook"
+          git push
